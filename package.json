@@ -1,0 +1,21 @@
+{
+  "name": "zipcode-search",
+  "version": "1.0.0",
+  "description": "郵便番号と住所の相互検索サイト",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s .",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": [
+    "郵便番号",
+    "住所",
+    "検索",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
