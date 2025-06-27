@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>��j�"</title>
+    <title>郵便番号検索</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,6 +40,7 @@
             border-radius: 5px;
             font-size: 16px;
             margin-bottom: 10px;
+            box-sizing: border-box;
         }
         button {
             background-color: #4CAF50;
@@ -72,19 +73,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>��j�"</h1>
+        <h1>郵便番号検索</h1>
         
         <div class="search-section">
-            <h2>O@K���j��"</h2>
-            <input type="text" id="addressInput" placeholder="�: q��7:S�B" />
-            <button onclick="searchZipcode()">"</button>
+            <h2>住所から郵便番号を検索</h2>
+            <input type="text" id="addressInput" placeholder="例: 東京都渋谷区道玄坂" />
+            <button onclick="searchZipcode()">検索</button>
             <div id="zipcodeResult"></div>
         </div>
         
         <div class="search-section">
-            <h2>��j�K�O@�"</h2>
-            <input type="text" id="zipcodeInput" placeholder="�: 1500043" />
-            <button onclick="searchAddress()">"</button>
+            <h2>郵便番号から住所を検索</h2>
+            <input type="text" id="zipcodeInput" placeholder="例: 1500043" />
+            <button onclick="searchAddress()">検索</button>
             <div id="addressResult"></div>
         </div>
     </div>
@@ -95,29 +96,29 @@
             const resultDiv = document.getElementById('zipcodeResult');
             
             if (!address) {
-                resultDiv.innerHTML = '<div class="result error">O@�e�WfO`UD</div>';
+                resultDiv.innerHTML = '<div class="result error">住所を入力してください</div>';
                 return;
             }
             
-            resultDiv.innerHTML = '<div class="result loading">"-...</div>';
+            resultDiv.innerHTML = '<div class="result loading">検索中...</div>';
             
             try {
                 const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?address=${encodeURIComponent(address)}`);
                 const data = await response.json();
                 
                 if (data.results && data.results.length > 0) {
-                    let html = '<div class="result"><strong>"P�:</strong><br>';
+                    let html = '<div class="result"><strong>検索結果:</strong><br>';
                     data.results.forEach(result => {
-                        html += `��j�: ${result.zipcode}<br>`;
-                        html += `O@: ${result.address1}${result.address2}${result.address3}<br><br>`;
+                        html += `郵便番号: ${result.zipcode}<br>`;
+                        html += `住所: ${result.address1}${result.address2}${result.address3}<br><br>`;
                     });
                     html += '</div>';
                     resultDiv.innerHTML = html;
                 } else {
-                    resultDiv.innerHTML = '<div class="result error">rSY���j�L�dK�~[�gW_</div>';
+                    resultDiv.innerHTML = '<div class="result error">該当する郵便番号が見つかりませんでした</div>';
                 }
             } catch (error) {
-                resultDiv.innerHTML = '<div class="result error">"-k���LzW~W_</div>';
+                resultDiv.innerHTML = '<div class="result error">検索中にエラーが発生しました</div>';
             }
         }
         
@@ -126,36 +127,36 @@
             const resultDiv = document.getElementById('addressResult');
             
             if (!zipcode) {
-                resultDiv.innerHTML = '<div class="result error">��j��e�WfO`UD</div>';
+                resultDiv.innerHTML = '<div class="result error">郵便番号を入力してください</div>';
                 return;
             }
             
             if (!/^\d{7}$/.test(zipcode) && !/^\d{3}-?\d{4}$/.test(zipcode)) {
-                resultDiv.innerHTML = '<div class="result error">cWD��j�nbge�WfO`UD7AnpW	</div>';
+                resultDiv.innerHTML = '<div class="result error">正しい郵便番号の形式で入力してください（7桁の数字）</div>';
                 return;
             }
             
             const cleanZipcode = zipcode.replace('-', '');
-            resultDiv.innerHTML = '<div class="result loading">"-...</div>';
+            resultDiv.innerHTML = '<div class="result loading">検索中...</div>';
             
             try {
                 const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanZipcode}`);
                 const data = await response.json();
                 
                 if (data.results && data.results.length > 0) {
-                    let html = '<div class="result"><strong>"P�:</strong><br>';
+                    let html = '<div class="result"><strong>検索結果:</strong><br>';
                     data.results.forEach(result => {
-                        html += `��j�: ${result.zipcode}<br>`;
-                        html += `O@: ${result.address1}${result.address2}${result.address3}<br>`;
-                        html += `��: ${result.kana1} ${result.kana2} ${result.kana3}<br><br>`;
+                        html += `郵便番号: ${result.zipcode}<br>`;
+                        html += `住所: ${result.address1}${result.address2}${result.address3}<br>`;
+                        html += `カナ: ${result.kana1} ${result.kana2} ${result.kana3}<br><br>`;
                     });
                     html += '</div>';
                     resultDiv.innerHTML = html;
                 } else {
-                    resultDiv.innerHTML = '<div class="result error">rSY�O@L�dK�~[�gW_</div>';
+                    resultDiv.innerHTML = '<div class="result error">該当する住所が見つかりませんでした</div>';
                 }
             } catch (error) {
-                resultDiv.innerHTML = '<div class="result error">"-k���LzW~W_</div>';
+                resultDiv.innerHTML = '<div class="result error">検索中にエラーが発生しました</div>';
             }
         }
         
