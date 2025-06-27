@@ -102,23 +102,44 @@
             
             resultDiv.innerHTML = '<div class="result loading">検索中...</div>';
             
+            // 住所から郵便番号への検索は多くの無料APIで制限されているため、
+            // ユーザーガイダンスを提供する実装に変更
             try {
-                const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?address=${encodeURIComponent(address)}`);
-                const data = await response.json();
+                // 入力された住所の都道府県を抽出
+                const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+                    '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+                    '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県',
+                    '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+                    '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+                    '徳島県', '香川県', '愛媛県', '高知県',
+                    '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
                 
-                if (data.results && data.results.length > 0) {
-                    let html = '<div class="result"><strong>検索結果:</strong><br>';
-                    data.results.forEach(result => {
-                        html += `郵便番号: ${result.zipcode}<br>`;
-                        html += `住所: ${result.address1}${result.address2}${result.address3}<br><br>`;
-                    });
+                let foundPref = null;
+                for (let pref of prefectures) {
+                    if (address.includes(pref)) {
+                        foundPref = pref;
+                        break;
+                    }
+                }
+                
+                if (foundPref) {
+                    let html = '<div class="result error">';
+                    html += '<strong>住所から郵便番号の検索について</strong><br><br>';
+                    html += `入力された住所: ${address}<br>`;
+                    html += `検出された都道府県: ${foundPref}<br><br>`;
+                    html += '<strong>正確な郵便番号検索のため、以下の方法をお試しください:</strong><br>';
+                    html += `• <a href="https://www.post.japanpost.jp/zipcode/" target="_blank">日本郵便公式サイト</a>で検索<br>`;
+                    html += '• 下の「郵便番号から住所を検索」機能をご利用ください<br>';
+                    html += '• より具体的な住所（町名・番地）を含めて再検索してください';
                     html += '</div>';
                     resultDiv.innerHTML = html;
                 } else {
-                    resultDiv.innerHTML = '<div class="result error">該当する郵便番号が見つかりませんでした</div>';
+                    resultDiv.innerHTML = '<div class="result error">都道府県名を含む住所を入力してください。<br>（例: 東京都渋谷区、大阪府大阪市など）</div>';
                 }
+                
             } catch (error) {
-                resultDiv.innerHTML = '<div class="result error">検索中にエラーが発生しました</div>';
+                console.error('Address search error:', error);
+                resultDiv.innerHTML = '<div class="result error">検索中にエラーが発生しました。<br><br><strong>代替方法:</strong><br>・<a href="https://www.post.japanpost.jp/zipcode/" target="_blank">日本郵便公式サイト</a>をご利用ください<br>・郵便番号から住所の検索をお試しください</div>';
             }
         }
         
